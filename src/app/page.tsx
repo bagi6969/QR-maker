@@ -5,7 +5,7 @@ import { TextField, Box, Container } from "@mui/material";
 import { useQr } from "@/app/context/HistoryContext";
 
 export default function Home() {
-  const { urls, addUrl } = useQr();
+  const { addUrl } = useQr();
   const [text, setText] = useState("");
   const [error, setError] = useState(false);
   const [showQr, setShowQr] = useState(false);
