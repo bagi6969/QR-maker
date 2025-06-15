@@ -1,95 +1,92 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+import { useState } from "react";
+import { QRCodeSVG } from "qrcode.react";
+import { TextField, Box, Container } from "@mui/material";
+import { useQr } from "@/app/context/HistoryContext";
 
 export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const { urls, addUrl } = useQr();
+  const [text, setText] = useState("");
+  const [error, setError] = useState(false);
+  const [showQr, setShowQr] = useState(false);
+  const [qrText, setQrText] = useState("");
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const validateUrl = (url: string): boolean => {
+    const trimmed = url.trim();
+    return trimmed.startsWith("http://") || trimmed.startsWith("https://");
+  };
+
+  const Change = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value;
+    setText(input);
+    setError(false);
+  };
+
+  const handleGenerate = () => {
+    if (!validateUrl(text)) {
+      setError(true);
+      setShowQr(false);
+    } else {
+      addUrl(text);
+      setQrText(text);
+      setShowQr(true);
+    }
+  };
+
+  return (
+    <Container
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: "50px",
+      }}
+    >
+      <Box textAlign="center">
+        <h1
+          style={{ fontSize: "30px", marginTop: "60px", marginBottom: "30px" }}
+        >
+          QR Code Generator
+        </h1>
+
+        <TextField
+          sx={{
+            width: "330px",
+            input: { color: "white" },
+            "& .MuiFormHelperText-root": {
+              fontSize: "14px",
+              color: "red",
+            },
+          }}
+          variant="outlined"
+          value={text}
+          placeholder="Enter URL starting with http:// or https://"
+          onChange={Change}
+          error={error}
+          helperText={
+            error ? "Invalid URL. Must start with http:// or https://" : ""
+          }
+        />
+
+        <Box sx={{ marginTop: "20px" }}>
+          <button style={{ width: "60px" }} onClick={handleGenerate}>
+            Generate
+          </button>
+        </Box>
+
+        {showQr && (
+          <Box
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignContent: "center",
+              margin: "30px",
+            }}
           >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+            <QRCodeSVG value={qrText} size={200} />
+          </Box>
+        )}
+      </Box>
+    </Container>
   );
 }

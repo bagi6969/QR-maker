@@ -1,0 +1,27 @@
+"use client";
+import { createContext, useContext, useState, ReactNode } from "react";
+
+type QrContextType = {
+  urls: string[];
+  addUrl: (url: string) => void;
+};
+
+const QrContext = createContext<QrContextType | undefined>(undefined);
+
+export const QrProvider = ({ children }: { children: ReactNode }) => {
+  const [urls, setUrls] = useState<string[]>([]);
+
+  const addUrl = (url: string) => {
+    setUrls((prev) => [...prev, url]);
+  };
+
+  return (
+    <QrContext.Provider value={{ urls, addUrl }}>{children}</QrContext.Provider>
+  );
+};
+
+export const useQr = () => {
+  const context = useContext(QrContext);
+  if (!context) throw new Error("useQr must be used inside QrProvider");
+  return context;
+};
