@@ -28,6 +28,7 @@ export default function Home() {
       setShowQr(false);
     } else {
       addUrl(text);
+      window.localStorage.setItem("qrHistory", text);
       setQrText(text);
       setShowQr(true);
     }

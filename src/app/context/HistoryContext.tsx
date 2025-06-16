@@ -1,5 +1,11 @@
 "use client";
-import { createContext, useContext, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 
 type QrContextType = {
   urls: string[];
@@ -11,6 +17,16 @@ const QrContext = createContext<QrContextType | undefined>(undefined);
 export const QrProvider = ({ children }: { children: ReactNode }) => {
   const [urls, setUrls] = useState<string[]>([]);
 
+  useEffect(() => {
+    const saved = localStorage.getItem("qrHistory");
+    if (saved) {
+      setUrls(JSON.parse(saved));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("qrHistory", JSON.stringify(urls));
+  }, [urls]);
   const addUrl = (url: string) => {
     setUrls((prev) => [...prev, url]);
   };
